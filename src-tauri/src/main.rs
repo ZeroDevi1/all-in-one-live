@@ -6,13 +6,15 @@ windows_subsystem = "windows"
 mod huya;
 mod common;
 mod bilibili;
+mod model;
 
 #[tauri::command]
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![greet])
         .invoke_handler(tauri::generate_handler![huya::get_huya_url])

@@ -11,17 +11,21 @@
   },
   "dependencies": {
     "@tauri-apps/api": "^1.0.2",
+    "@types/video.js": "7.x",
+    "dplayer": "^1.27.0",
     "element-plus": "^2.2.16",
     "flv-extend": "^0.1.0",
     "flv.js": "^1.6.2",
     "hls.js": "^1.2.1",
     "pinia": "^2.0.22",
     "pinia-plugin-persistedstate": "^2.2.0",
+    "video.js": "7.x",
     "vue": "^3.2.37",
     "vue-router": "^4.1.5"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.0.5",
+    "@types/dplayer": "^1.25.2",
     "@types/node": "^18.7.10",
     "@vitejs/plugin-vue": "^3.0.1",
     "typescript": "^4.6.4",

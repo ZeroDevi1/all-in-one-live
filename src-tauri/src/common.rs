@@ -1,4 +1,5 @@
-use serde::{Serialize, Serializer, Deserialize};
+use serde::{Serialize, Deserialize};
+
 /// 直播间
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LiveRoomDetail {

@@ -10,6 +10,7 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 // 导入 router
 import router from "./router";
+
 const pinia = createPinia() // 初始化 Pinia
 pinia.use(piniaPluginPersistedstate) // 激活 Pinia 插件
 createApp(App)
