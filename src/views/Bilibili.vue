@@ -25,11 +25,11 @@
 import {invoke} from "@tauri-apps/api/tauri";
 import {ref, onMounted, reactive} from "vue";
 import 'vue3-video-play/dist/style.css'
+// @ts-ignore
 import vue3videoPlay from 'vue3-video-play' // 引入组件
 
 
 const input = ref("");
-const videoUrl = ref('')
 const options = reactive({
   src: "", //视频源
   type: 'm3u8', //视频类型
@@ -52,9 +52,7 @@ const options = reactive({
 const getBilibiliUrl = () => {
   invoke('get_bilibili_url', {roomId: input.value}).then((res: any) => {
     console.log(res)
-    videoUrl.value = res
     options.src = res
-    // initPlayer(res)
 
   }).catch((err: any) => {
     console.log(err)
@@ -62,7 +60,7 @@ const getBilibiliUrl = () => {
 }
 const handleCopy = (e: ClipboardEvent) => {
   // clipboardData 可能是 null
-  e.clipboardData && e.clipboardData.setData('text/plain', videoUrl.value);
+  e.clipboardData && e.clipboardData.setData('text/plain', options.src);
   e.preventDefault();
   // removeEventListener 要传入第二个参数
   document.removeEventListener('copy', handleCopy);
