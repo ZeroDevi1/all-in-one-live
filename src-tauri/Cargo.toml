@@ -28,8 +28,10 @@ rbatis = { version = "4.0.35" }
 rbdc = "0.1.21"
 rbdc-sqlite = { version = "0.1.13" }
 once_cell = "1.14.0"
-# huya
-huya = { path = "./huya" }
+# common
+common = { path = "./common" }
+# async-trait
+async-trait = "0.1.57"
 [features]
 # by default Tauri runs in production mode
 # when `tauri dev` runs it is executed with `cargo run --no-default-features` if `devPath` is an URL

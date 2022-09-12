@@ -10,6 +10,7 @@ import Greet from "./components/Greet.vue";
       <el-aside width="200px">
         <el-menu router>
           <el-menu-item index="/">虎牙</el-menu-item>
+          <el-menu-item index="/bilibili">哔哩哔哩</el-menu-item>
         </el-menu>
       </el-aside>
       <el-main>

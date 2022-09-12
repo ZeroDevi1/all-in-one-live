@@ -39,6 +39,7 @@ const getHuyaUrl = () => {
     console.log(err)
   })
 }
+
 const handleCopy = (e: ClipboardEvent) => {
   // clipboardData 可能是 null
   e.clipboardData && e.clipboardData.setData('text/plain', videoUrl.value);

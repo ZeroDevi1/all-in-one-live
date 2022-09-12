@@ -38,9 +38,10 @@ dependencies = [
 name = "all_in_one_live"
 version = "0.0.0"
 dependencies = [
+ "async-trait",
  "base64",
+ "common",
  "fast_log",
- "huya",
  "log",
  "once_cell",
  "rbatis",
@@ -384,6 +385,21 @@ checksum = "35ed6e9d84f0b51a7f52daf1c7d71dd136fd7a3f41a8462b8cdb8c78d920fad4"
 dependencies = [
  "bytes",
  "memchr",
+]
+
+[[package]]
+name = "common"
+version = "0.1.0"
+dependencies = [
+ "base64",
+ "chrono",
+ "hex",
+ "md5",
+ "percent-encoding",
+ "regex",
+ "serde",
+ "serde_json",
+ "tokio",
 ]
 
 [[package]]
@@ -1425,21 +1441,6 @@ name = "httpdate"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c4a1e36c821dbe04574f602848a19f742f4fb3c98d40449f11bcad18d6b17421"
-
-[[package]]
-name = "huya"
-version = "0.1.0"
-dependencies = [
- "base64",
- "chrono",
- "hex",
- "md5",
- "percent-encoding",
- "regex",
- "serde",
- "serde_json",
- "tokio",
-]
 
 [[package]]
 name = "hyper"
