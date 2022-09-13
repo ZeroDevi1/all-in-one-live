@@ -5,7 +5,7 @@
     </el-col>
     <el-col :span="6">
       <el-button type="primary" @click="getHuyaUrl">获取直播URL</el-button>
-    </el-col>
+     </el-col>
     <el-col :span="6">
       <el-button type="primary" @click="copyHuyaUrl">复制直播URL</el-button>
     </el-col>
