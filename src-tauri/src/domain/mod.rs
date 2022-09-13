@@ -1,22 +1,22 @@
-use log::LevelFilter;
-use rbatis::rbatis::Rbatis;
-use rbatis::rbdc::datetime::FastDateTime;
-use rbatis::rbdc::db::Driver;
-use rbatis::table_sync::{RbatisTableSync, SqliteTableSync};
-use rbdc_sqlite::driver::SqliteDriver;
-use serde::{Deserialize, Serialize};
+pub(crate) mod table;
+pub(crate) mod mapper;
 
-/// example table
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct LiveInfo {
-    pub id: Option<String>,
-    pub name: Option<String>,
-    pub status: Option<i32>,
-    pub create_time: Option<FastDateTime>,
-}
+use log::LevelFilter;
+use rbatis::Rbatis;
+use once_cell::sync::Lazy;
+use once_cell::sync::OnceCell;
+use rbatis::table_sync::{RbatisTableSync, SqliteTableSync};
+use rbdc::db::Driver;
+use rbdc_sqlite::driver::SqliteDriver;
+use rbatis::rbdc::datetime::FastDateTime;
+use serde::{Deserialize, Serialize};
+use crate::domain::table::live_info::LiveInfo;
+
+// pub static mut RB: Lazy<Rbatis> = Lazy::new(|| init_db());
+pub static mut RB: OnceCell<Rbatis> = OnceCell::new();
 
 /// make a sqlite-rbatis
-pub async fn init_db() -> Rbatis {
+pub fn init_db() -> Rbatis {
     let rb = Rbatis::new();
     // ------------choose database driver------------
     // rb.init(rbdc_mysql::driver::MysqlDriver {}, "mysql://root:123456@localhost:3306/test").unwrap();
@@ -26,22 +26,23 @@ pub async fn init_db() -> Rbatis {
         .unwrap();
 
     // ------------sync tables------------
-    let mut s = RbatisTableSync::new();
-    let driver = SqliteDriver {};
-    s.insert(driver.name().to_string(), Box::new(SqliteTableSync {}));
-    fast_log::LOGGER.set_level(LevelFilter::Off);
-    s.sync(
-        driver.name(),
-        rb.acquire().await.unwrap(),
-        &LiveInfo {
-            id: None,
-            name: None,
-            status: None,
-            create_time: None,
-        },
-    )
-        .await
-        .unwrap();
+    // let mut s = RbatisTableSync::new();
+    // let driver = SqliteDriver {};
+    // s.insert(driver.name().to_string(), Box::new(SqliteTableSync {}));
+    // fast_log::LOGGER.set_level(LevelFilter::Off);
+    // s.sync(
+    //     driver.name(),
+    //     rb.acquire().await.unwrap(),
+    //     &LiveInfo {
+    //         id: None,
+    //         name: None,
+    //         status: None,
+    //         create_time: None,
+    //         url: None,
+    //     },
+    // )
+    //     .await
+    //     .unwrap();
     fast_log::LOGGER.set_level(LevelFilter::Info);
     // ------------sync tables end------------
 

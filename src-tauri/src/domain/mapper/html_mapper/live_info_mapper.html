@@ -1,0 +1,14 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "https://raw.githubusercontent.com/rbatis/rbatis/master/rbatis-codegen/mybatis-3-mapper.dtd">
+<mapper>
+    <select id="select_live_info_by_condition">
+        `select * from live_info`
+        <where>
+            <if test="room_id != ''">
+                ` and room_id like #{room_id}`
+            </if>
+            <if test="site_name != ''">
+                ` and site_name like #{site_name}`
+            </if>
+        </where>
+    </select>
+</mapper>

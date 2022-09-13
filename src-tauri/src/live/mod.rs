@@ -1,8 +1,11 @@
 use common::bilibili::parse_bilibili_url;
+use rbdc::datetime::FastDateTime;
 use reqwest::header::HeaderMap;
 use serde_json::Value;
 use tauri::regex;
-use crate::common_type::{LiveRoomDetail};
+use crate::domain::mapper::live_info_mapper::select_live_info_by_condition;
+use crate::domain::table::live_info::{LiveInfo, LiveRoomDetail};
+use crate::RB;
 use crate::rest_tool::{get_text, get_text_with_header};
 
 /// 获取虎牙直播间地址
@@ -39,6 +42,29 @@ pub async fn get_huya_url(room_id: String) -> String {
         data: format!("https:{}", live_line_url),
         url,
     };
+    unsafe {
+        let vec
+            = select_live_info_by_condition(&mut RB.get().unwrap(), room_id.as_str(), "虎牙直播").await.unwrap();
+        // 如果 vec 为空
+        if vec.is_empty(){
+            // 插入直播
+            let live_info = LiveInfo{
+                id: None,
+                name: Some(room_id.clone()),
+                status: Some("1".into()),
+                create_time: Some(FastDateTime::now()),
+                room_id: Some(room_id.clone()),
+                site_name: Some("虎牙直播".into()),
+                site_url: Some("https://www.huya.com/".into()),
+            };
+            let data = LiveInfo::insert(
+                &mut RB.get().unwrap(),
+                &live_info
+            ).await;
+            println!("data: {:?}", data);
+        }
+    }
+
     common::huya::parse_huya_url(live_line_url)
 }
 
@@ -48,6 +74,30 @@ pub async fn get_bilibili_url(room_id: String) -> String {
 
     let url = format!("https://api.live.bilibili.com/xlive/web-room/v2/index/getRoomPlayInfo?room_id={}&protocol=0,1&format=0,1,2&codec=0,1&qn={}&platform=h5&ptype=8",
                       room_id, 10000);
+    unsafe {
+        let vec
+            = select_live_info_by_condition(&mut RB.get().unwrap(), room_id.as_str(), "哔哩哔哩").await.unwrap();
+        // 如果 vec 为空
+        if vec.is_empty(){
+            // 插入直播
+            let live_info = LiveInfo{
+                id: None,
+                name: Some(room_id.clone()),
+                status: Some("1".into()),
+                create_time: Some(FastDateTime::now()),
+                room_id: Some(room_id.clone()),
+                site_name: Some("哔哩哔哩".into()),
+                site_url: Some("https://live.bilibili.com/".into()),
+            };
+            let data = LiveInfo::insert(
+                &mut RB.get().unwrap(),
+                &live_info
+            ).await;
+            println!("data: {:?}", data);
+        }
+    }
+
+
     // 组装header
     let mut headers = HeaderMap::new();
     headers.insert("User-Agent", "Mozilla/5.0 (iPod; CPU iPhone OS 14_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/87.0.4280.163 Mobile/15E148 Safari/604.1".parse().unwrap());

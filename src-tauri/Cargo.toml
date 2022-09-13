@@ -23,10 +23,11 @@ base64 = "0.13.0"
 # logging(option)
 log = "0.4.17"
 fast_log = "1.5.36"
-rbs = { version = "0.1.11" }
-rbatis = { version = "4.0.35" }
-rbdc = "0.1.21"
+rbs = { version = "0.1.11"}
+rbatis = { version = "4.0.35"}
+# choose one rbdc drivier
 rbdc-sqlite = { version = "0.1.13" }
+rbdc = "0.1.21"
 once_cell = "1.14.0"
 # common
 common = { path = "./common" }
@@ -39,3 +40,7 @@ default = ["custom-protocol"]
 # this feature is used used for production builds where `devPath` points to the filesystem
 # DO NOT remove this
 custom-protocol = ["tauri/custom-protocol"]
+[profile.release]
+lto = true
+opt-level = 3
+codegen-units = 1

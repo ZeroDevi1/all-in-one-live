@@ -11,6 +11,11 @@ const routes: Array<RouteRecordRaw> = [
         name: "Bilibili",
         component: () => import("../../views/Bilibili.vue"),
     },
+    {
+        path: "/favorite",
+        name: "Favorite",
+        component: () => import("../../views/Favorite.vue"),
+    },
 ]
 
 export default routes;
