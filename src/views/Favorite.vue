@@ -46,12 +46,10 @@ const toVlc = (row: LiveInfo) => {
   window.location.href = `vlc://${row.direct_url}`
 }
 const getRealUrl = (liveInfo: LiveInfo) => {
-  console.log(liveInfo.room_id, liveInfo.site_name)
   switch (liveInfo.site_name) {
       // 虎牙直播
     case '虎牙直播':
       invoke('get_huya_url', {roomId: liveInfo.room_id}).then((res: any) => {
-        console.log(res)
         copyText(res)
         liveInfo.direct_url = res
         // 提示复制成功
@@ -61,7 +59,6 @@ const getRealUrl = (liveInfo: LiveInfo) => {
       // 哔哩哔哩
     case '哔哩哔哩':
       invoke('get_bilibili_url', {roomId: liveInfo.room_id}).then((res: any) => {
-        console.log(res)
         copyText(res)
         liveInfo.direct_url = res
         ElMessage.success('复制成功')
@@ -74,7 +71,6 @@ const liveInfoList = ref<LiveInfo[]>([])
 
 const listLiveInfo = () => {
   invoke('list_live_info').then((res: any) => {
-    console.log(res)
     liveInfoList.value = res as LiveInfo[]
   })
 }
