@@ -15,8 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       # 输出ID 追加平台信息
-      RELEASE_UPLOAD_ID: ${{ steps.create_release.outputs.RELEASE_ID }}
-
+      RELEASE_UPLOAD_ID: ${{ steps.create_release.outputs.result  }}
 
     steps:
       - uses: actions/checkout@v2
@@ -33,13 +32,27 @@ jobs:
       # 根据查询到的版本号创建 release
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        uses: actions/create-release@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          tag_name: '${{ steps.get_version.outputs.VERSION }}'
+#          release_name: 'app ${{ steps.get_version.outputs.VERSION }}'
+#          body_path: ${{ github.workspace }}-CHANGELOG.txt
+        uses: actions/github-script@v6
         with:
-          tag_name: '${{ steps.get_version.outputs.VERSION }}'
-          release_name: 'app ${{ steps.get_version.outputs.VERSION }}'
-          body_path: ${{ github.workspace }}-CHANGELOG.txt
+          script: |
+            const { data } = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: `app-v${process.env.PACKAGE_VERSION}`,
+              name: `Desktop App v${process.env.PACKAGE_VERSION}`,
+              body: 'Take a look at the assets to download and install this app.',
+              draft: true,
+              prerelease: false
+            })
+            
+            return data.id
 
   # 编译 Tauri
   build-tauri:
@@ -108,29 +121,29 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
-          releaseName: "App v__VERSION__"
-          releaseBody: "See the assets to download this version and install."
-          releaseDraft: true
-          prerelease: false
-#          releaseId: ${{ needs.create-release.outputs.RELEASE_UPLOAD_ID }}
+#          tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
+#          releaseName: "App v__VERSION__"
+#          releaseBody: "See the assets to download this version and install."
+#          releaseDraft: true
+#          prerelease: false
+          releaseId: ${{ needs.create-release.outputs.RELEASE_UPLOAD_ID }}
   # 任务：上传 release 版本
-#  publish-release:
-#    runs-on: ubuntu-20.04
-#    needs: [ create-release, build-tauri ]
-#
-#    steps:
-#      - name: publish release
-#        id: publish-release
-#        uses: actions/github-script@v6
-#        env:
-#          release_id: ${{ needs.create-release.outputs.RELEASE_UPLOAD_ID }}
-#        with:
-#          script: |
-#            github.rest.repos.updateRelease({
-#              owner: context.repo.owner,
-#              repo: context.repo.repo,
-#              release_id: process.env.release_id,
-#              draft: false,
-#              prerelease: false
-#            })
+  publish-release:
+    runs-on: ubuntu-20.04
+    needs: [ create-release, build-tauri ]
+
+    steps:
+      - name: publish release
+        id: publish-release
+        uses: actions/github-script@v6
+        env:
+          release_id: ${{ needs.create-release.outputs.RELEASE_UPLOAD_ID }}
+        with:
+          script: |
+            github.rest.repos.updateRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: process.env.release_id,
+              draft: false,
+              prerelease: false
+            })
