@@ -12,3 +12,7 @@
 
 - [ ] 直链提取
 - [ ] 在线播放
+
+## 参考
+- https://github.com/wbt5/real-url
+- https://github.com/xiaoyaocz/AllLive
