@@ -12,7 +12,12 @@ on:
 jobs:
   # 任务：创建 release 版本
   create-release:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ macos-latest, windows-latest ]
+
+    runs-on: ${{ matrix.platform }}
     outputs:
       RELEASE_UPLOAD_ID: ${{ steps.create_release.outputs.id }}
 
