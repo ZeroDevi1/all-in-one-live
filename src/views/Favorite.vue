@@ -1,23 +1,55 @@
 <template>
-  <el-table :data="liveInfoList" style="width: 100%">
-    <el-table-column prop="id" label="ID" width="180"/>
-    <el-table-column prop="site_name" label="网站" width="180"/>
-    <el-table-column prop="room_id" label="房间号" width="180"/>
-    <el-table-column fixed="right" label="操作" width="240">
-      <template #default="scope">
-        <el-button link type="primary" size="small" @click="getRealUrl(scope.row)"
-        >获取直链
-        </el-button
+  <div class="app-container">
+    <el-row :gutter="20">
+      <!--  新增按钮-->
+      <el-button type="primary" @click="openAddForm">新增</el-button>
+    </el-row>
+    <el-row :gutter="20">
+      <el-table :data="liveInfoList" style="width: 100%">
+        <el-table-column prop="id" label="ID" width="180"/>
+        <el-table-column prop="site_name" label="网站" width="180"/>
+        <el-table-column prop="room_id" label="房间号" width="180"/>
+        <el-table-column fixed="right" label="操作" width="240">
+          <template #default="scope">
+            <el-button link type="primary" size="small" @click="getRealUrl(scope.row)"
+            >获取直链
+            </el-button
+            >
+            <el-button link type="primary" size="small" @click="toVlc(scope.row)"
+                       :disabled="scope.row.direct_url ==null"
+            >跳转VLC
+            </el-button
+            >
+            <el-button link type="primary" size="small" @click="delById(scope.row)">删除</el-button>
+            <!--        <el-button link type="primary" size="small" @click="toVlc">VLC</el-button>-->
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-row>
+
+    <el-dialog v-model="dialogFormVisible" :title="title">
+      <el-form :model="model">
+        <el-form-item label="房间号">
+          <el-input v-model="model.room_id"/>
+        </el-form-item>
+        <el-form-item label="直播网站">
+          <el-select v-model="model.site_name" placeholder="请选择直播网站">
+            <el-option label="虎牙直播" value="虎牙直播"/>
+            <el-option label="哔哩哔哩" value="哔哩哔哩"/>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="cancelForm">取消</el-button>
+        <el-button type="primary" @click="submitForm"
+        >确认</el-button
         >
-        <el-button link type="primary" size="small" @click="toVlc(scope.row)" :disabled="scope.row.direct_url ==null"
-        >跳转VLC
-        </el-button
-        >
-        <el-button link type="primary" size="small">删除</el-button>
-        <!--        <el-button link type="primary" size="small" @click="toVlc">VLC</el-button>-->
+      </span>
       </template>
-    </el-table-column>
-  </el-table>
+    </el-dialog>
+  </div>
+
 </template>
 
 <script setup lang="ts">
@@ -26,8 +58,11 @@ import {ref, onMounted} from "vue";
 import {copyText} from "../libs/copy";
 import {ElMessage} from "element-plus";
 
+const dialogFormVisible = ref(false)
+const title = ref('')
+
 interface LiveInfo {
-  id: number,
+  id?: number,
   name: string,
   site_name: string,
   site_url: string,
@@ -37,10 +72,16 @@ interface LiveInfo {
   direct_url: string,
 }
 
-// const toVlc = (url:string) =>{
-//   // 在当前页面跳转到 vlc://${url}
-//   window.location.href = `vlc://${url}`
-// }
+const model = ref<LiveInfo>({
+  name: '',
+  site_name: '',
+  site_url: '',
+  room_id: '',
+  status: '',
+  create_time: '',
+  direct_url: '',
+})
+
 const toVlc = (row: LiveInfo) => {
   // 在当前页面跳转到 vlc://${url}
   window.location.href = `vlc://${row.direct_url}`
@@ -75,6 +116,57 @@ const listLiveInfo = () => {
   })
 }
 
+const delById = (liveInfo: LiveInfo) => {
+  invoke('del_live_info_by_id', {id: liveInfo.id}).then((res: any) => {
+    listLiveInfo()
+  })
+}
+
+const openAddForm = () => {
+  dialogFormVisible.value = true
+  title.value = '新增'
+}
+
+const submitForm = () => {
+  // 根据直播网站设置 siteUrl
+  switch (model.value.site_name) {
+    case '虎牙直播':
+      model.value.site_url = 'https://www.huya.com/'
+      break;
+    case '哔哩哔哩':
+      model.value.site_url = 'https://live.bilibili.com/'
+      break;
+  }
+  model.value.name = model.value.room_id
+  invoke('add_live_info', {"liveInfo": model.value}).then((res: any) => {
+    listLiveInfo()
+    dialogFormVisible.value = false
+    // 清空 model
+    model.value = {
+      name: '',
+      site_name: '',
+      site_url: '',
+      room_id: '',
+      status: '',
+      create_time: '',
+      direct_url: '',
+    }
+  })
+}
+
+const cancelForm = () => {
+  dialogFormVisible.value = false
+  // 清空 model
+  model.value = {
+    name: '',
+    site_name: '',
+    site_url: '',
+    room_id: '',
+    status: '',
+    create_time: '',
+    direct_url: '',
+  }
+}
 
 onMounted(() => {
   listLiveInfo()
@@ -84,5 +176,23 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.el-button--text {
+  margin-right: 15px;
+}
 
+.el-select {
+  width: 300px;
+}
+
+.el-input {
+  width: 300px;
+}
+
+el-row {
+  margin: 10px;
+}
+
+.dialog-footer button:first-child {
+  margin-right: 10px;
+}
 </style>

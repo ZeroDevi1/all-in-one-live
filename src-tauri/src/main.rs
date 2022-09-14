@@ -25,7 +25,7 @@ async fn main() {
     let rbatis = init_db();
     unsafe { RB.set(rbatis).unwrap(); }
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![live::get_huya_url,live::get_bilibili_url,crate::domain::mapper::live_info_mapper::list_live_info])
+        .invoke_handler(tauri::generate_handler![live::get_huya_url,live::get_bilibili_url,crate::domain::mapper::live_info_mapper::list_live_info,crate::domain::mapper::live_info_mapper::del_live_info_by_id,crate::domain::mapper::live_info_mapper::add_live_info])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
