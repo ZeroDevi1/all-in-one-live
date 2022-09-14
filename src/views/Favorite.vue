@@ -27,7 +27,7 @@
       </el-table>
     </el-row>
 
-    <el-dialog v-model="dialogFormVisible" :title="title">
+    <el-dialog v-model="dialogFormVisible" :title="title" @close="cancelForm">
       <el-form :model="model">
         <el-form-item label="房间号">
           <el-input v-model="model.room_id"/>
