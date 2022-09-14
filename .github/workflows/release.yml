@@ -19,7 +19,9 @@ jobs:
 
     runs-on: ${{ matrix.platform }}
     outputs:
-      RELEASE_UPLOAD_ID: ${{ steps.create_release.outputs.id }}
+      # 输出ID 追加平台信息
+      RELEASE_UPLOAD_ID: ${{ steps.create_release.outputs.RELEASE_ID }}-${{ matrix.platform }}
+
 
     steps:
       - uses: actions/checkout@v2
