@@ -6,6 +6,7 @@ pub mod huya {
         let line_data = data.replace(r".*?\.hls\.common\.com", "https://tx.hls.huya.com");
         // 把 line_data 中的 hls.common.com 替换为 flv.common.com，_2000替换为"",ratio=2000&替换为"",.m3u8替换为.flv
         let line_data = line_data.replace("hls.common.com", "flv.common.com").replace("_2000", "").replace("ratio=2000&", "").replace(".m3u8", ".flv");
+        println!("line_data: {}", line_data);
         // rust 通过正则替换 wsTime的值为631c39e6
         // let re = regex::Regex::new(r#"wsTime=(.*?)&"#).unwrap();
         // let line_data = re.replace_all(&line_data, "wsTime=631c39e6&").to_string();
