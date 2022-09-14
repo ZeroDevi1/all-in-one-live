@@ -79,25 +79,43 @@ jobs:
       # 可选，如果需要使用 rsw 构建 wasm，则安装 rsw
       - name: Install rsw
         run: cargo install rsw
-
-      # 获取 yarn 缓存路径
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
-
-      # 使用 yarn 缓存
-      - name: Yarn cache
-        uses: actions/cache@v2
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+      # 使用 pnpm
+      - uses: pnpm/action-setup@v2.0.1
+        name: Use pnpm
+        id: pnpm-install
         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          version: 7
+          run_install: false
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: |
+          echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-pnpm-store-
+        
+#       # 获取 yarn 缓存路径
+#       - name: Get yarn cache directory path
+#         id: yarn-cache-dir-path
+#         run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+
+#       # 使用 yarn 缓存
+#       - name: Yarn cache
+#         uses: actions/cache@v2
+#         id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+#         with:
+#           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+#           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+#           restore-keys: |
+#             ${{ runner.os }}-yarn-
 
       # 安装依赖执行构建，以及推送 github release
       - name: Install app dependencies and build it
-        run: yarn && yarn build
+        run: pnpm install && pnpm tauri dev
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
