@@ -12,7 +12,7 @@ on:
 jobs:
   # 任务：创建 release 版本
   create-release:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     outputs:
       # 输出ID 追加平台信息
       RELEASE_UPLOAD_ID: ${{ steps.create_release.outputs.RELEASE_ID }}
