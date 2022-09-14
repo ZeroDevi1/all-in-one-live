@@ -27,7 +27,9 @@ jobs:
         run: |
           echo "using version tag ${GITHUB_REF:10}"
           echo ::set-output name=version::"${GITHUB_REF:10}"
-
+      # 创建 ChangeLog
+      - name: Generate Changelog
+        run: echo "# Good things have arrived" > ${{ github.workspace }}-CHANGELOG.txt
       # 根据查询到的版本号创建 release
       - name: Create Release
         id: create_release
@@ -37,7 +39,7 @@ jobs:
         with:
           tag_name: '${{ steps.get_version.outputs.VERSION }}'
           release_name: 'app ${{ steps.get_version.outputs.VERSION }}'
-          body: 'See the assets to download this version and install.'
+          body_path: ${{ github.workspace }}-CHANGELOG.txt
 
   # 编译 Tauri
   build-tauri:
@@ -45,7 +47,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-latest, windows-latest]
+        platform: [macos-latest, ubuntu-latest,windows-latest]
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -99,25 +101,9 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
-        
-#       # 获取 yarn 缓存路径
-#       - name: Get yarn cache directory path
-#         id: yarn-cache-dir-path
-#         run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
-
-#       # 使用 yarn 缓存
-#       - name: Yarn cache
-#         uses: actions/cache@v2
-#         id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
-#         with:
-#           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-#           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-#           restore-keys: |
-#             ${{ runner.os }}-yarn-
-
       # 安装依赖执行构建，以及推送 github release
       - name: Install app dependencies and build it
-        run: pnpm install && pnpm tauri dev
+        run: pnpm install && pnpm tauri build
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
