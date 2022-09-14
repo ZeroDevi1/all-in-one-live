@@ -2,6 +2,7 @@
 
 聚合直播，直链提取
 
+[![Release CI](https://github.com/ZeroDevi1/all-in-one-live/actions/workflows/release.yml/badge.svg)](https://github.com/ZeroDevi1/all-in-one-live/actions/workflows/release.yml)
 ## 主要平台
 
 - [x] 虎牙
