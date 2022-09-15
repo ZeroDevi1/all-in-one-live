@@ -27,27 +27,28 @@ jobs:
           echo "using version tag ${GITHUB_REF:10}"
           echo ::set-output name=version::"${GITHUB_REF:10}"
       # 创建 ChangeLog
-      - name: Generate Changelog
-        run: echo "# Good things have arrived" > ${{ github.workspace }}-CHANGELOG.txt
+      - name: Generate changelog
+        id: changelog
+        uses: metcalfc/changelog-generator@v3.0.0
+        with:
+          myToken: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get the changelog
+        run: |
+          cat << "EOF"
+          ${{ steps.changelog.outputs.changelog }}
+          EOF
       # 根据查询到的版本号创建 release
       - name: Create Release
         id: create_release
-#        uses: actions/create-release@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          tag_name: '${{ steps.get_version.outputs.VERSION }}'
-#          release_name: 'app ${{ steps.get_version.outputs.VERSION }}'
-#          body_path: ${{ github.workspace }}-CHANGELOG.txt
         uses: actions/github-script@v6
         with:
           script: |
             const { data } = await github.rest.repos.createRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              tag_name: `app-${{ steps.get_version.outputs.VERSION }}`,
+              tag_name: `All-In-One-Live ${{ steps.get_version.outputs.VERSION }}`,
               name: `All-In-One-Live ${{ steps.get_version.outputs.VERSION }}`,
-              body: 'Take a look at the assets to download and install this app.',
+              body: `${{ steps.changelog.outputs.changelog }}`,
               draft: false,
               prerelease: false
             })
