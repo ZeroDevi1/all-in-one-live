@@ -46,7 +46,7 @@ jobs:
             const { data } = await github.rest.repos.createRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              tag_name: `All-In-One-Live ${{ steps.get_version.outputs.VERSION }}`,
+              tag_name: `${{ steps.get_version.outputs.VERSION }}`,
               name: `All-In-One-Live ${{ steps.get_version.outputs.VERSION }}`,
               body: `${{ steps.changelog.outputs.changelog }}`,
               draft: false,
