@@ -8,6 +8,13 @@ use crate::domain::table::live_info::{LiveInfo, LiveRoomDetail};
 use crate::RB;
 use crate::rest_tool::{get_text, get_text_with_header};
 
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct Quality {
+    pub desc: String,
+    pub hdr_desc: String,
+    pub quality: i32,
+    url: String,
+}
 /// 获取虎牙直播间地址
 #[tauri::command]
 pub async fn get_huya_url(room_id: String) -> String {
@@ -64,8 +71,69 @@ pub async fn get_huya_url(room_id: String) -> String {
             println!("data: {:?}", data);
         }
     }
-
+    println!("live_line_url: {}", live_line_url);
     common::huya::parse_huya_url(live_line_url)
+}
+
+/// 获取 bilibili 直播间地址
+#[tauri::command()]
+pub async fn get_bilibili_urls_with_quality(room_id: String) -> Vec<Quality> {
+
+    let url = format!("https://api.live.bilibili.com/xlive/web-room/v2/index/getRoomPlayInfo?room_id={}&protocol=0,1&format=0,1,2&codec=0,1&qn={}&platform=h5&ptype=8",
+                      room_id, 10000);
+    unsafe {
+        let vec
+            = select_live_info_by_condition(&mut RB.get().unwrap(), room_id.as_str(), "哔哩哔哩").await.unwrap();
+        // 如果 vec 为空
+        if vec.is_empty(){
+            // 插入直播
+            let live_info = LiveInfo{
+                id: None,
+                name: Some(room_id.clone()),
+                status: Some("1".into()),
+                create_time: Some(FastDateTime::now()),
+                room_id: Some(room_id.clone()),
+                site_name: Some("哔哩哔哩".into()),
+                site_url: Some("https://live.bilibili.com/".into()),
+            };
+            let data = LiveInfo::insert(
+                &mut RB.get().unwrap(),
+                &live_info
+            ).await;
+            println!("data: {:?}", data);
+        }
+    }
+
+
+    // 组装header
+    let mut headers = HeaderMap::new();
+    headers.insert("User-Agent", "Mozilla/5.0 (iPod; CPU iPhone OS 14_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/87.0.4280.163 Mobile/15E148 Safari/604.1".parse().unwrap());
+    let result = get_text_with_header(url.as_str(), headers).await;
+    // 获取清晰度
+    let json: Value = serde_json::from_str(result.as_str()).unwrap();
+    let quality_list = json["data"]["playurl_info"]["playurl"]["g_qn_desc"].as_array().unwrap();
+
+    let mut bilibili_urls: Vec<Quality> = vec![];
+    for quality in quality_list {
+        println!("quality: {}", quality);
+        let url = format!("https://api.live.bilibili.com/xlive/web-room/v2/index/getRoomPlayInfo?room_id={}&protocol=0,1&format=0,1,2&codec=0,1&qn={}&platform=h5&ptype=8",
+                          room_id, quality["qn"].as_i64().unwrap());
+        let mut quality_struct = Quality {
+            desc: quality["desc"].as_str().unwrap().to_string(),
+            hdr_desc: quality["hdr_desc"].as_str().unwrap().to_string(),
+            quality: quality["qn"].as_i64().unwrap() as i32,
+            url: "".to_string(),
+        };
+
+        // 组装header
+        let mut headers = HeaderMap::new();
+        headers.insert("User-Agent", "Mozilla/5.0 (iPod; CPU iPhone OS 14_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/87.0.4280.163 Mobile/15E148 Safari/604.1".parse().unwrap());
+        let result = get_text_with_header(url.as_str(), headers).await;
+        let bilibili_url_list = parse_bilibili_url(result);
+        quality_struct.url = bilibili_url_list.get(0).unwrap().to_string();
+        bilibili_urls.push(quality_struct);
+    }
+    bilibili_urls
 }
 
 /// 获取 bilibili 直播间地址

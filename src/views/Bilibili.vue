@@ -12,10 +12,10 @@
   </el-row>
   <el-row>
     <el-col :span="24">
-        <vue3videoPlay
-            class="bilibili-video"
-            v-bind="options"
-        />
+      <vue3videoPlay
+          class="bilibili-video"
+          v-bind="options"
+      />
     </el-col>
   </el-row>
 
@@ -26,7 +26,10 @@ import {invoke} from "@tauri-apps/api/tauri";
 import {ref, onMounted, reactive} from "vue";
 import 'vue3-video-play/dist/style.css'
 // @ts-ignore
-import vue3videoPlay from 'vue3-video-play' // 引入组件
+import vue3videoPlay from 'vue3-video-play'
+import {Quality} from "../libs/type";
+import {ElMessage, ElMessageBox} from "element-plus";
+import {copyText} from "../libs/copy"; // 引入组件
 
 
 const input = ref("");
@@ -48,12 +51,27 @@ const options = reactive({
   control: true, //是否显示控制
   controlBtns:['audioTrack', 'quality', 'speedRate', 'volume', 'setting', 'pip', 'pageFullScreen', 'fullScreen'] //显示所有按钮,
 })
+const handleClose = (done: () => void) => {
+  ElMessageBox.confirm('Are you sure to close this dialog?')
+      .then(() => {
+        done()
+        // dialogVisible.value = false
+      })
+      .catch(() => {
+        // catch error
+      })
+}
 
+const setUrl = (quality: Quality) => {
+  options.src = quality.url
+  // dialogVisible.value = false
+}
 const getBilibiliUrl = () => {
   invoke('get_bilibili_url', {roomId: input.value}).then((res: any) => {
     console.log(res)
     options.src = res
-
+    // qualityList.value = res
+    // dialogVisible.value = true
   }).catch((err: any) => {
     console.log(err)
   })
