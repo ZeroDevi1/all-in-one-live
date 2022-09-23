@@ -6,24 +6,18 @@
     </el-row>
     <el-row :gutter="20">
       <el-table :data="liveInfoList" style="width: 100%">
-        <el-table-column prop="id" label="ID" width="180"/>
-        <el-table-column prop="site_name" label="网站" width="180"/>
-        <el-table-column prop="room_id" label="房间号" width="180"/>
+        <el-table-column prop="id" label="ID" width="180" />
+        <el-table-column prop="site_name" label="网站" width="180" />
+        <el-table-column prop="room_id" label="房间号" width="180" />
         <el-table-column fixed="right" label="操作" width="290">
           <template #default="scope">
-            <el-button link type="primary" size="small" @click="getRealUrl(scope.row)"
-            >获取直链
-            </el-button
-            >
+            <el-button link type="primary" size="small" @click="getRealUrl(scope.row)">获取直链
+            </el-button>
             <el-button link type="primary" size="small" @click="toVlc(scope.row)"
-                       :disabled="scope.row.direct_url ==null"
-            >跳转VLC
-            </el-button
-            >
-            <el-button v-if="scope.row.site_name === '哔哩哔哩'" link type="primary" size="small" @click="selectQuality(scope.row)"
-            >选择清晰度
-            </el-button
-            >
+              :disabled="scope.row.direct_url ==null">跳转VLC
+            </el-button>
+            <el-button link type="primary" size="small" @click="selectQuality(scope.row)">选择清晰度
+            </el-button>
             <el-button link type="primary" size="small" @click="delById(scope.row)">删除</el-button>
             <!--        <el-button link type="primary" size="small" @click="toVlc">VLC</el-button>-->
           </template>
@@ -34,36 +28,31 @@
     <el-dialog v-model="dialogFormVisible" :title="title" @close="cancelForm">
       <el-form :model="model">
         <el-form-item label="房间号">
-          <el-input v-model="model.room_id"/>
+          <el-input v-model="model.room_id" />
         </el-form-item>
         <el-form-item label="直播网站">
           <el-select v-model="model.site_name" placeholder="请选择直播网站">
-            <el-option label="虎牙直播" value="虎牙直播"/>
-            <el-option label="哔哩哔哩" value="哔哩哔哩"/>
+            <el-option label="虎牙直播" value="虎牙直播" />
+            <el-option label="哔哩哔哩" value="哔哩哔哩" />
           </el-select>
         </el-form-item>
       </el-form>
       <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="cancelForm">取消</el-button>
-        <el-button type="primary" @click="submitForm"
-        >确认</el-button
-        >
-      </span>
+        <span class="dialog-footer">
+          <el-button @click="cancelForm">取消</el-button>
+          <el-button type="primary" @click="submitForm">确认</el-button>
+        </span>
       </template>
     </el-dialog>
-    <el-dialog
-        v-model="dialogVisible"
-        title="选择清晰度"
-        width="30%"
-        :before-close="handleClose"
-    >
+    <el-dialog v-model="dialogVisible" title="选择清晰度" width="36%" :before-close="handleClose">
       <el-table :data="qualityList" style="width: 100%">
-        <el-table-column prop="desc" label="desc" width="180"/>
+        <el-table-column prop="desc" label="desc" width="180" />
         <el-table-column fixed="right" label="操作" width="240">
           <template #default="scope">
-            <el-button link type="primary" size="small" @click="copyUrl(scope.row)"
-            >复制直链
+            <el-button link type="primary" size="small" @click="copyUrl(scope.row)">复制直链
+            </el-button>
+            <el-button link type="primary" size="small" @click="toVlcQuality(scope.row)"
+              :disabled="scope.row.url ==null">跳转VLC
             </el-button>
             <!--          <el-button link type="primary" size="small" @click="toVlc(scope.row)"-->
             <!--                     :disabled="scope.row.direct_url ==null"-->
@@ -89,11 +78,11 @@
 </template>
 
 <script setup lang="ts">
-import {invoke} from "@tauri-apps/api/tauri";
-import {ref, onMounted} from "vue";
-import {copyText} from "../libs/copy";
-import {ElMessage, ElMessageBox} from "element-plus";
-import {Quality} from "../libs/type";
+import { invoke } from "@tauri-apps/api/tauri";
+import { ref, onMounted } from "vue";
+import { copyText } from "../libs/copy";
+import { ElMessage, ElMessageBox } from "element-plus";
+import { Quality } from "../libs/type";
 
 const dialogFormVisible = ref(false)
 const title = ref('')
@@ -101,14 +90,14 @@ const qualityList = ref<Quality[]>()
 const dialogVisible = ref(false)
 
 const handleClose = (done: () => void) => {
-  ElMessageBox.confirm('Are you sure to close this dialog?')
-      .then(() => {
-        done()
-        // dialogVisible.value = false
-      })
-      .catch(() => {
-        // catch error
-      })
+  ElMessageBox.confirm('是否关闭选择框?')
+    .then(() => {
+      done()
+      // dialogVisible.value = false
+    })
+    .catch(() => {
+      // catch error
+    })
 }
 
 interface LiveInfo {
@@ -136,27 +125,32 @@ const toVlc = (row: LiveInfo) => {
   // 在当前页面跳转到 vlc://${url}
   window.location.href = `vlc://${row.direct_url}`
 }
+
+const toVlcQuality = (row: Quality) => {
+  // 在当前页面跳转到 vlc://${url}
+  window.location.href = `vlc://${row.url}`
+}
 // 获取直播直链
 const getRealUrl = (liveInfo: LiveInfo) => {
   switch (liveInfo.site_name) {
-      // 虎牙直播
+    // 虎牙直播
     case '虎牙直播':
-      invoke('get_huya_url', {roomId: liveInfo.room_id}).then((res: any) => {
+      invoke('get_huya_url', { roomId: liveInfo.room_id }).then((res: any) => {
         copyText(res)
         liveInfo.direct_url = res
         // 提示复制成功
         ElMessage.success('复制成功')
       })
       break;
-      // 哔哩哔哩
+    // 哔哩哔哩
     case '哔哩哔哩':
-      invoke('get_bilibili_url', {roomId: liveInfo.room_id}).then((res: any) => {
+      invoke('get_bilibili_url', { roomId: liveInfo.room_id }).then((res: any) => {
         copyText(res)
         liveInfo.direct_url = res
         ElMessage.success('复制成功')
       })
       break;
-      // 斗鱼直播
+    // 斗鱼直播
   }
 }
 // 存储的直播信息
@@ -171,7 +165,7 @@ const listLiveInfo = () => {
 
 // 删除直播间
 const delById = (liveInfo: LiveInfo) => {
-  invoke('del_live_info_by_id', {id: liveInfo.id}).then((res: any) => {
+  invoke('del_live_info_by_id', { id: liveInfo.id }).then((res: any) => {
     listLiveInfo()
   })
 }
@@ -194,7 +188,7 @@ const submitForm = () => {
       break;
   }
   model.value.name = model.value.room_id
-  invoke('add_live_info', {"liveInfo": model.value}).then((res: any) => {
+  invoke('add_live_info', { "liveInfo": model.value }).then((res: any) => {
     listLiveInfo()
     dialogFormVisible.value = false
     // 清空 model
@@ -233,10 +227,21 @@ const copyUrl = (quality: Quality) => {
 
 // 选择清晰度
 const selectQuality = (liveInfo: LiveInfo) => {
-  invoke('get_bilibili_urls_with_quality', {roomId: liveInfo.room_id}).then((res: any) => {
-    qualityList.value = res
-    dialogVisible.value = true
-  })
+  switch (liveInfo.site_name) {
+    case '哔哩哔哩':
+      invoke('get_bilibili_urls_with_quality', { roomId: liveInfo.room_id }).then((res: any) => {
+        qualityList.value = res
+        dialogVisible.value = true
+      })
+      break;
+    case '虎牙直播':
+      invoke('get_huya_urls_with_quality', { roomId: liveInfo.room_id }).then((res: any) => {
+        qualityList.value = res
+        dialogVisible.value = true
+      })
+      break;
+  }
+
 }
 
 onMounted(() => {

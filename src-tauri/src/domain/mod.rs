@@ -30,7 +30,10 @@ pub async fn init_db() -> Rbatis {
     // 判断 live.db 是否存在
     if !std::path::Path::new("live.db").exists() {
         // 如果不存在，创建 live.db
-        let mut sql = "CREATE TABLE live_info (
+        // 使用管理员权限创建 live.db 文件
+        let file = std::fs::File::create("live.db").unwrap();
+        // 向 live.db 文件中写入数据
+        let sql = "CREATE TABLE live_info (
   id INTEGER NOT NULL,
   name TEXT,
   status TEXT,

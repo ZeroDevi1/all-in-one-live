@@ -1,11 +1,7 @@
 pub mod huya {
     pub fn parse_huya_url(url: String) -> String {
-        let data = format!("https:{}", url);
-        // 根据 live_room_detail 的 data 获取清晰度
-        // 把 data 中符合 .*?\.hls\.common\.com 正则替换为 https://tx.hls.huya.com，选择线路
-        let line_data = data.replace(r".*?\.hls\.common\.com", "https://tx.hls.huya.com");
-        // 把 line_data 中的 hls.common.com 替换为 flv.common.com，_2000替换为"",ratio=2000&替换为"",.m3u8替换为.flv
-        let line_data = line_data.replace("hls.common.com", "flv.common.com").replace("_2000", "").replace("ratio=2000&", "").replace(".m3u8", ".flv");
+        // 把 line_data 中的 hls.huya.com 替换为 flv.huya.com，_2000替换为"",ratio=2000&替换为"",.m3u8替换为.flv
+        let line_data = url.replace("hls.huya.com", "flv.huya.com").replace("_2000", "").replace("ratio=2000&", "").replace(".m3u8", ".flv");
         println!("line_data: {}", line_data);
         // rust 通过正则替换 wsTime的值为631c39e6
         // let re = regex::Regex::new(r#"wsTime=(.*?)&"#).unwrap();
