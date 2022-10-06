@@ -26,9 +26,13 @@ async fn main() {
         RB.set(rbatis.await).unwrap();
     }
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![live::get_huya_url,
+        .invoke_handler(tauri::generate_handler![
+            live::get_huya_url,
+            live::get_douyu_url,
             live::get_bilibili_url,
-            live::get_bilibili_urls_with_quality,live::get_huya_urls_with_quality,
+            live::get_bilibili_urls_with_quality,
+            live::get_douyu_urls_with_quality,
+            live::get_huya_urls_with_quality,
             crate::domain::mapper::live_info_mapper::list_live_info,
             crate::domain::mapper::live_info_mapper::del_live_info_by_id,
             crate::domain::mapper::live_info_mapper::add_live_info])

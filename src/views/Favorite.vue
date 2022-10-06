@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <div id="mui-player"></div>
     <el-row :gutter="20">
       <!--  新增按钮-->
       <el-button type="primary" @click="openAddForm">新增</el-button>
@@ -34,6 +35,7 @@
           <el-select v-model="model.site_name" placeholder="请选择直播网站">
             <el-option label="虎牙直播" value="虎牙直播" />
             <el-option label="哔哩哔哩" value="哔哩哔哩" />
+            <el-option label="斗鱼直播" value="斗鱼直播" />
           </el-select>
         </el-form-item>
       </el-form>
@@ -83,6 +85,77 @@ import { ref, onMounted } from "vue";
 import { copyText } from "../libs/copy";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { Quality } from "../libs/type";
+
+
+import 'mui-player/dist/mui-player.min.css'
+// @ts-ignore
+import MuiPlayer from 'mui-player'
+// 使用模块管理器引入插件
+// @ts-ignore
+import MuiPlayerDesktopPlugin from 'mui-player-desktop-plugin'
+import Hls from "hls.js";
+import Flv from 'flv.js'
+
+// 初始化 MuiPlayer 插件，MuiPlayer 方法传递一个对象，该对象包括所有插件的配置
+let mp: MuiPlayer;
+
+const buildPlayer = (url: string) => {
+  // 如果 url 是 m3u8 格式的直播流，可以使用 hls.js 来播放
+  if (url.indexOf('.m3u8') > -1) {
+    mp = new MuiPlayer({
+      container: '#mui-player',
+      title: '标题',
+      src: url,
+      parse: {
+        type: 'hls',
+        loader: Hls,
+        config: { // hls config to：https://github.com/video-dev/hls.js/blob/HEAD/docs/API.md#fine-tuning
+          debug: false,
+        },
+      },
+      plugins:[
+        new MuiPlayerDesktopPlugin({
+          customSetting:[
+
+          ], // 设置组配置
+          contextmenu:[
+
+          ], // 右键菜单组配置
+          thumbnails:[
+
+          ],  // 缩略图配置
+        })
+      ]
+    })
+  } else {
+    mp = new MuiPlayer({
+      container: '#mui-player',
+      title: '标题',
+      src: url,
+      parse: {
+        type: 'flv',
+        loader: Flv, // flv config to：https://github.com/Bilibili/flv.js/blob/HEAD/docs/api.md#flvjscreateplayer
+        config: {
+          cors: true
+        },
+      },
+      plugins:[
+        new MuiPlayerDesktopPlugin({
+          customSetting:[
+
+          ], // 设置组配置
+          contextmenu:[
+
+          ], // 右键菜单组配置
+          thumbnails:[
+
+          ],  // 缩略图配置
+        })
+      ]
+    })
+  }
+
+}
 
 const dialogFormVisible = ref(false)
 const title = ref('')
@@ -151,7 +224,15 @@ const getRealUrl = (liveInfo: LiveInfo) => {
       })
       break;
     // 斗鱼直播
+    case '斗鱼直播':
+      invoke('get_douyu_url', { roomId: liveInfo.room_id }).then((res: any) => {
+        copyText(res)
+        liveInfo.direct_url = res
+        ElMessage.success('复制成功')
+      })
+      break;
   }
+  buildPlayer(liveInfo.direct_url)
 }
 // 存储的直播信息
 const liveInfoList = ref<LiveInfo[]>([])
@@ -185,6 +266,9 @@ const submitForm = () => {
       break;
     case '哔哩哔哩':
       model.value.site_url = 'https://live.bilibili.com/'
+      break;
+    case '斗鱼直播':
+      model.value.site_url = 'https://www.douyu.com/'
       break;
   }
   model.value.name = model.value.room_id
@@ -240,12 +324,19 @@ const selectQuality = (liveInfo: LiveInfo) => {
         dialogVisible.value = true
       })
       break;
+    case '斗鱼直播':
+    invoke('get_douyu_urls_with_quality', { roomId: liveInfo.room_id }).then((res: any) => {
+        qualityList.value = res
+        dialogVisible.value = true
+      })
+      break;
   }
 
 }
 
 onMounted(() => {
   listLiveInfo()
+  buildPlayer('')
 })
 
 
