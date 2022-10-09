@@ -14,11 +14,6 @@ extern crate rbdc;
 
 use crate::domain::{init_db, RB};
 
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
-
 #[tokio::main]
 async fn main() {
     let rbatis = init_db();

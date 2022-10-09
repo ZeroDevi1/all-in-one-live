@@ -82,7 +82,6 @@
 <script setup lang="ts">
 import { invoke } from "@tauri-apps/api/tauri";
 import { ref, onMounted } from "vue";
-import { copyText } from "../libs/copy";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { Quality } from "../libs/type";
 
@@ -95,6 +94,10 @@ import MuiPlayer from 'mui-player'
 import MuiPlayerDesktopPlugin from 'mui-player-desktop-plugin'
 import Hls from "hls.js";
 import Flv from 'flv.js'
+
+// clipboard
+import { writeText, readText } from '@tauri-apps/api/clipboard';
+
 
 // 初始化 MuiPlayer 插件，MuiPlayer 方法传递一个对象，该对象包括所有插件的配置
 let mp: MuiPlayer;
@@ -304,8 +307,8 @@ const cancelForm = () => {
 }
 
 // 复制链接
-const copyUrl = (quality: Quality) => {
-  copyText(quality.url)
+const copyUrl = async (quality: Quality) => {
+  await writeText(quality.url);
   dialogVisible.value = false
 }
 
