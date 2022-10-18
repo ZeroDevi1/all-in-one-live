@@ -7,15 +7,15 @@
     </el-row>
     <el-row :gutter="20">
       <el-table :data="liveInfoList" style="width: 100%">
-        <el-table-column prop="id" label="ID" width="180" />
-        <el-table-column prop="site_name" label="网站" width="180" />
-        <el-table-column prop="room_id" label="房间号" width="180" />
+        <el-table-column prop="id" label="ID" width="180"/>
+        <el-table-column prop="site_name" label="网站" width="180"/>
+        <el-table-column prop="room_id" label="房间号" width="180"/>
         <el-table-column fixed="right" label="操作" width="290">
           <template #default="scope">
             <el-button link type="primary" size="small" @click="getRealUrl(scope.row)">获取直链
             </el-button>
             <el-button link type="primary" size="small" @click="toVlc(scope.row)"
-              :disabled="scope.row.direct_url ==null">跳转VLC
+                       :disabled="scope.row.direct_url ==null">跳转VLC
             </el-button>
             <el-button link type="primary" size="small" @click="selectQuality(scope.row)">选择清晰度
             </el-button>
@@ -28,13 +28,13 @@
     <el-dialog v-model="dialogFormVisible" :title="title" @close="cancelForm">
       <el-form :model="model">
         <el-form-item label="房间号">
-          <el-input v-model="model.room_id" />
+          <el-input v-model="model.room_id"/>
         </el-form-item>
         <el-form-item label="直播网站">
           <el-select v-model="model.site_name" placeholder="请选择直播网站">
-            <el-option label="虎牙直播" value="虎牙直播" />
-            <el-option label="哔哩哔哩" value="哔哩哔哩" />
-            <el-option label="斗鱼直播" value="斗鱼直播" />
+            <el-option label="虎牙直播" value="虎牙直播"/>
+            <el-option label="哔哩哔哩" value="哔哩哔哩"/>
+            <el-option label="斗鱼直播" value="斗鱼直播"/>
           </el-select>
         </el-form-item>
       </el-form>
@@ -47,15 +47,15 @@
     </el-dialog>
     <el-dialog v-model="dialogVisible" title="选择清晰度" width="36%" :before-close="handleClose">
       <el-table :data="qualityList" style="width: 100%">
-        <el-table-column prop="desc" label="desc" width="180" />
+        <el-table-column prop="desc" label="desc" width="180"/>
         <el-table-column fixed="right" label="操作" width="240">
           <template #default="scope">
             <el-button link type="primary" size="small" @click="copyUrl(scope.row)">复制直链
             </el-button>
             <el-button link type="primary" size="small" @click="toVlcQuality(scope.row)"
-              :disabled="scope.row.url ==null">跳转VLC
+                       :disabled="scope.row.url ==null">跳转VLC
             </el-button>
-          
+
           </template>
         </el-table-column>
       </el-table>
@@ -66,10 +66,10 @@
 </template>
 
 <script setup lang="ts">
-import { invoke } from "@tauri-apps/api/tauri";
-import { ref, onMounted } from "vue";
-import { ElMessage, ElMessageBox } from "element-plus";
-import { Quality } from "../libs/type";
+import {invoke} from "@tauri-apps/api/tauri";
+import {ref, onMounted} from "vue";
+import {ElMessage, ElMessageBox} from "element-plus";
+import {Quality} from "../libs/type";
 
 
 import 'mui-player/dist/mui-player.min.css'
@@ -82,7 +82,7 @@ import Hls from "hls.js";
 import Flv from 'flv.js'
 
 // clipboard
-import { writeText, readText } from '@tauri-apps/api/clipboard';
+import {writeText, readText} from '@tauri-apps/api/clipboard';
 
 
 // 初始化 MuiPlayer 插件，MuiPlayer 方法传递一个对象，该对象包括所有插件的配置
@@ -102,17 +102,11 @@ const buildPlayer = (url: string) => {
           debug: false,
         },
       },
-      plugins:[
+      plugins: [
         new MuiPlayerDesktopPlugin({
-          customSetting:[
-
-          ], // 设置组配置
-          contextmenu:[
-
-          ], // 右键菜单组配置
-          thumbnails:[
-
-          ],  // 缩略图配置
+          customSetting: [], // 设置组配置
+          contextmenu: [], // 右键菜单组配置
+          thumbnails: [],  // 缩略图配置
         })
       ]
     })
@@ -128,17 +122,11 @@ const buildPlayer = (url: string) => {
           cors: true
         },
       },
-      plugins:[
+      plugins: [
         new MuiPlayerDesktopPlugin({
-          customSetting:[
-
-          ], // 设置组配置
-          contextmenu:[
-
-          ], // 右键菜单组配置
-          thumbnails:[
-
-          ],  // 缩略图配置
+          customSetting: [], // 设置组配置
+          contextmenu: [], // 右键菜单组配置
+          thumbnails: [],  // 缩略图配置
         })
       ]
     })
@@ -153,13 +141,13 @@ const dialogVisible = ref(false)
 
 const handleClose = (done: () => void) => {
   ElMessageBox.confirm('是否关闭选择框?')
-    .then(() => {
-      done()
-      // dialogVisible.value = false
-    })
-    .catch(() => {
-      // catch error
-    })
+      .then(() => {
+        done()
+        // dialogVisible.value = false
+      })
+      .catch(() => {
+        // catch error
+      })
 }
 
 interface LiveInfo {
@@ -195,26 +183,26 @@ const toVlcQuality = (row: Quality) => {
 // 获取直播直链
 const getRealUrl = (liveInfo: LiveInfo) => {
   switch (liveInfo.site_name) {
-    // 虎牙直播
+      // 虎牙直播
     case '虎牙直播':
-      invoke('get_huya_url', { roomId: liveInfo.room_id }).then((res: any) => {
+      invoke('get_huya_url', {roomId: liveInfo.room_id}).then(async (res: any) => {
         await writeText(res)
         liveInfo.direct_url = res
         // 提示复制成功
         ElMessage.success('复制成功')
       })
       break;
-    // 哔哩哔哩
+      // 哔哩哔哩
     case '哔哩哔哩':
-      invoke('get_bilibili_url', { roomId: liveInfo.room_id }).then((res: any) => {
+      invoke('get_bilibili_url', {roomId: liveInfo.room_id}).then(async (res: any) => {
         await writeText(res)
         liveInfo.direct_url = res
         ElMessage.success('复制成功')
       })
       break;
-    // 斗鱼直播
+      // 斗鱼直播
     case '斗鱼直播':
-      invoke('get_douyu_url', { roomId: liveInfo.room_id }).then((res: any) => {
+      invoke('get_douyu_url', {roomId: liveInfo.room_id}).then(async (res: any) => {
         await writeText(res)
         liveInfo.direct_url = res
         ElMessage.success('复制成功')
@@ -235,7 +223,7 @@ const listLiveInfo = () => {
 
 // 删除直播间
 const delById = (liveInfo: LiveInfo) => {
-  invoke('del_live_info_by_id', { id: liveInfo.id }).then((res: any) => {
+  invoke('del_live_info_by_id', {id: liveInfo.id}).then((res: any) => {
     listLiveInfo()
   })
 }
@@ -261,7 +249,7 @@ const submitForm = () => {
       break;
   }
   model.value.name = model.value.room_id
-  invoke('add_live_info', { "liveInfo": model.value }).then((res: any) => {
+  invoke('add_live_info', {"liveInfo": model.value}).then((res: any) => {
     listLiveInfo()
     dialogFormVisible.value = false
     // 清空 model
@@ -302,19 +290,19 @@ const copyUrl = async (quality: Quality) => {
 const selectQuality = (liveInfo: LiveInfo) => {
   switch (liveInfo.site_name) {
     case '哔哩哔哩':
-      invoke('get_bilibili_urls_with_quality', { roomId: liveInfo.room_id }).then((res: any) => {
+      invoke('get_bilibili_urls_with_quality', {roomId: liveInfo.room_id}).then((res: any) => {
         qualityList.value = res
         dialogVisible.value = true
       })
       break;
     case '虎牙直播':
-      invoke('get_huya_urls_with_quality', { roomId: liveInfo.room_id }).then((res: any) => {
+      invoke('get_huya_urls_with_quality', {roomId: liveInfo.room_id}).then((res: any) => {
         qualityList.value = res
         dialogVisible.value = true
       })
       break;
     case '斗鱼直播':
-    invoke('get_douyu_urls_with_quality', { roomId: liveInfo.room_id }).then((res: any) => {
+      invoke('get_douyu_urls_with_quality', {roomId: liveInfo.room_id}).then((res: any) => {
         qualityList.value = res
         dialogVisible.value = true
       })
