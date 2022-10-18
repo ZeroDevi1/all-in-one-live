@@ -20,7 +20,6 @@
             <el-button link type="primary" size="small" @click="selectQuality(scope.row)">选择清晰度
             </el-button>
             <el-button link type="primary" size="small" @click="delById(scope.row)">删除</el-button>
-            <!--        <el-button link type="primary" size="small" @click="toVlc">VLC</el-button>-->
           </template>
         </el-table-column>
       </el-table>
@@ -56,24 +55,11 @@
             <el-button link type="primary" size="small" @click="toVlcQuality(scope.row)"
               :disabled="scope.row.url ==null">跳转VLC
             </el-button>
-            <!--          <el-button link type="primary" size="small" @click="toVlc(scope.row)"-->
-            <!--                     :disabled="scope.row.direct_url ==null"-->
-            <!--          >跳转VLC-->
-            <!--          </el-button-->
-            <!--          >-->
-            <!--          <el-button link type="primary" size="small" @click="delById(scope.row)">删除</el-button>-->
-            <!--          &lt;!&ndash;        <el-button link type="primary" size="small" @click="toVlc">VLC</el-button>&ndash;&gt;-->
+          
           </template>
         </el-table-column>
       </el-table>
-      <!--    <template #footer>-->
-      <!--      <span class="dialog-footer">-->
-      <!--        <el-button @click="dialogVisible = false">Cancel</el-button>-->
-      <!--        <el-button type="primary" @click="dialogVisible = false"-->
-      <!--        >Confirm</el-button-->
-      <!--        >-->
-      <!--      </span>-->
-      <!--    </template>-->
+
     </el-dialog>
   </div>
 
@@ -212,7 +198,7 @@ const getRealUrl = (liveInfo: LiveInfo) => {
     // 虎牙直播
     case '虎牙直播':
       invoke('get_huya_url', { roomId: liveInfo.room_id }).then((res: any) => {
-        copyText(res)
+        await writeText(res)
         liveInfo.direct_url = res
         // 提示复制成功
         ElMessage.success('复制成功')
@@ -221,7 +207,7 @@ const getRealUrl = (liveInfo: LiveInfo) => {
     // 哔哩哔哩
     case '哔哩哔哩':
       invoke('get_bilibili_url', { roomId: liveInfo.room_id }).then((res: any) => {
-        copyText(res)
+        await writeText(res)
         liveInfo.direct_url = res
         ElMessage.success('复制成功')
       })
@@ -229,7 +215,7 @@ const getRealUrl = (liveInfo: LiveInfo) => {
     // 斗鱼直播
     case '斗鱼直播':
       invoke('get_douyu_url', { roomId: liveInfo.room_id }).then((res: any) => {
-        copyText(res)
+        await writeText(res)
         liveInfo.direct_url = res
         ElMessage.success('复制成功')
       })
