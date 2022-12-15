@@ -10,7 +10,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@tauri-apps/api": "^1.1.0",
+    "@tauri-apps/api": "2.0.0-alpha.0",
     "element-plus": "^2.2.17",
     "flv.js": "^1.6.2",
     "hls.js": "^1.2.4",
@@ -22,10 +22,11 @@
     "vue-router": "^4.1.5"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^1.1.1",
+    "@tauri-apps/cli": "2.0.0-alpha.0",
     "@types/dplayer": "^1.25.2",
     "@types/node": "^18.8.2",
     "@vitejs/plugin-vue": "^3.1.2",
+    "internal-ip": "^7.0.0",
     "typescript": "^4.8.4",
     "unplugin-auto-import": "^0.11.2",
     "unplugin-vue-components": "^0.22.8",

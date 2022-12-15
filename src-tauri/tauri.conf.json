@@ -12,12 +12,7 @@
   },
   "tauri": {
     "allowlist": {
-      "all": true,
-      "clipboard": {
-        "all": true,
-        "writeText": true,
-        "readText": true
-      }
+      "all": true
     },
     "bundle": {
       "active": true,
