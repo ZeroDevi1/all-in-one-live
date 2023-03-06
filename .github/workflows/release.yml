@@ -29,7 +29,7 @@ jobs:
       # 创建 ChangeLog
       - name: Generate changelog
         id: changelog
-        uses: metcalfc/changelog-generator@v3.0.0
+        uses: metcalfc/changelog-generator@v4.0.1
         with:
           myToken: ${{ secrets.GITHUB_TOKEN }}
       - name: Get the changelog
@@ -61,7 +61,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ macos-latest,windows-latest ]
+        platform: [ macos-latest,windows-latest,ubuntu-20.04 ]
 
     runs-on: ${{ matrix.platform }}
     steps:
